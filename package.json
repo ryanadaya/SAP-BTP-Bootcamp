@@ -1,0 +1,39 @@
+{
+  "name": "MyProject",
+  "version": "1.0.0",
+  "dependencies": {
+    "@cap-js/hana": "^2",
+    "@sap/cds": "^9",
+    "@sap/hdi-deploy": "^5.6.1",
+    "@sap/xssec": "^4",
+    "hdb": "^2.27.1"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2",
+    "@sap/cds-dk": "^9"
+  },
+  "scripts": {
+    "start": "cds-serve"
+  },
+  "private": true,
+  "cds": {
+    "build": {
+      "tasks": [
+        {
+          "for": "hana"
+        },
+        {
+          "for": "nodejs"
+        }
+      ]
+    },
+    "requires": {
+      "[production]": {
+        "auth": "xsuaa",
+        "db": "hana"
+      },
+      "destinations": true,
+      "html5-repo": true
+    }
+  }
+}

@@ -1,0 +1,52 @@
+_schema-version: 3.3.0
+ID: MyProject
+version: 1.0.0
+description: "A simple CAP project."
+
+parameters:
+  enable-parallel-deployments: true
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production
+        - sed -i 's/deploy\.jse/deploy.js/g' gen/db/package.json
+
+modules:
+  - name: MyProject-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: MyProject-auth
+      - name: MyProject-db
+      - name: MyProject-destination
+
+  - name: MyProject-db-deployer
+    type: hdb
+    path: gen/db
+    requires:
+      - name: MyProject-db
+
+resources:
+  - name: MyProject-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+
+  - name: MyProject-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+
+  - name: MyProject-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
